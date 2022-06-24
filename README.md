@@ -7,7 +7,7 @@ into a terraform project made it easier for us to deploy, use, and maintain at R
 1. Clone this repository into a directory
 2. Create a `repo` directory peered with `config`
 3. Create a `prod-us-west-2` or similar directory under `repo`
-4. Create a module to import the project like this
+4. Create a module `mail.tf` file to import the project like this
 
 ```hcl
 provider "aws" {
@@ -23,7 +23,7 @@ module "lambda_bulk_tagger_us_west_2" {
 (If you are using https://releasehub.com, follow instructions for setting up a terraform runner with
 repository attached to an application).
 
-#How it works
+# How it works
 Follow the excellent README from the original project https://github.com/rom1spi/aws-bulk-tagger#use-case
 
 We have adapted the Lambda to use a cloudwatch event cycle of 1 hour (57 minutes actually) to feed
@@ -87,4 +87,3 @@ various tags with various values`
 Feel free to open a pull request or github issue on this repository! We also have some very minor set
 of contributions to the original Python source code we have not submitted upstream. If you would like
 to help us or contribute back, let us know!
-# terraform-aws-bulk-tagger
