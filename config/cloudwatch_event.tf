@@ -4,6 +4,54 @@ locals {
   function_qualifier     = regex("[:]([0-9]+)$", local.function_qualified_arn)[0]
 }
 
+module "lambda-cloudwatch-trigger-lambda-preprod" {
+  source = "./cloudwatch-module/"
+
+  namespace = "lambda-preprod"
+  lambda_input = jsonencode({
+    "TagFilters" = [
+      {
+        "Key" = "ddmonitor",
+        "Values" = [
+          "false"
+        ]
+      }
+    ],
+    "TagsToApply" = {
+      "VantaNonProd" = "true"
+      "VantaNoAlert" = "Non-essential tooling running in Lambda and no user data stored."
+    },
+    "ResourceTypeFilters" = [
+      "lambda"
+    ]
+  })
+  lambda_arn                 = local.function_qualified_arn
+  lambda_function_name       = local.function_name
+  lambda_qualifier           = local.function_qualifier
+  lambda_schedule_expression = "rate(53 minutes)"
+}
+
+module "lambda-cloudwatch-trigger-lambda-all" {
+  source = "./cloudwatch-module/"
+
+  namespace = "lambda-all"
+  lambda_input = jsonencode({
+    "TagFilters" = [
+    ],
+    "TagsToApply" = {
+      "VantaDescription"      = "Lambda Function Running in AWS"
+      "VantaContainsUserData" = "false",
+    },
+    "ResourceTypeFilters" = [
+      "lambda"
+    ]
+  })
+  lambda_arn                 = local.function_qualified_arn
+  lambda_function_name       = local.function_name
+  lambda_qualifier           = local.function_qualifier
+  lambda_schedule_expression = "rate(47 minutes)"
+}
+
 module "lambda-cloudwatch-trigger-rds" {
   source = "./cloudwatch-module/"
 
@@ -30,7 +78,7 @@ module "lambda-cloudwatch-trigger-rds" {
   lambda_arn                 = local.function_qualified_arn
   lambda_function_name       = local.function_name
   lambda_qualifier           = local.function_qualifier
-  lambda_schedule_expression = "rate(57 minutes)"
+  lambda_schedule_expression = "rate(59 minutes)"
 }
 
 module "lambda-cloudwatch-trigger-alb-preprod" {
@@ -66,7 +114,7 @@ module "lambda-cloudwatch-trigger-alb-preprod" {
   lambda_arn                 = local.function_qualified_arn
   lambda_function_name       = local.function_name
   lambda_qualifier           = local.function_qualifier
-  lambda_schedule_expression = "rate(57 minutes)"
+  lambda_schedule_expression = "rate(61 minutes)"
 }
 
 module "lambda-cloudwatch-trigger-alb-prod" {
@@ -84,8 +132,8 @@ module "lambda-cloudwatch-trigger-alb-prod" {
       },
     ],
     "TagsToApply" = {
-      "VantaDescription"      = "Load Balancer in AWS",
-      "VantaOwner"            = "owner@example.com"
+      "VantaDescription" = "Load Balancer in AWS",
+      "VantaOwner"       = "owner@example.com"
     },
     "ResourceTypeFilters" = [
       "elasticloadbalancing"
@@ -94,7 +142,7 @@ module "lambda-cloudwatch-trigger-alb-prod" {
   lambda_arn                 = local.function_qualified_arn
   lambda_function_name       = local.function_name
   lambda_qualifier           = local.function_qualifier
-  lambda_schedule_expression = "rate(57 minutes)"
+  lambda_schedule_expression = "rate(67 minutes)"
 }
 
 module "lambda-cloudwatch-trigger-owners" {
@@ -103,13 +151,14 @@ module "lambda-cloudwatch-trigger-owners" {
   namespace = "owners"
   lambda_input = jsonencode({
     "TagKeyExclusion" = "VantaOwner",
-    "TagFilters" = [],
+    "TagFilters"      = [],
     "TagsToApply" = {
-      "VantaOwner"            = "owner@example.com"
+      "VantaOwner" = "owner@example.com"
     },
     "ResourceTypeFilters" = [
       "elasticloadbalancing",
       "ec2:instance",
+      "lambda",
       "s3",
       "rds",
       "redshift",
@@ -120,5 +169,5 @@ module "lambda-cloudwatch-trigger-owners" {
   lambda_arn                 = local.function_qualified_arn
   lambda_function_name       = local.function_name
   lambda_qualifier           = local.function_qualifier
-  lambda_schedule_expression = "rate(57 minutes)"
+  lambda_schedule_expression = "rate(71 minutes)"
 }

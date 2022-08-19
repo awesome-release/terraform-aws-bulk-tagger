@@ -56,6 +56,8 @@ data "aws_iam_policy_document" "execution_role" {
     ]
     effect = "Allow"
     resources = [
+      "arn:aws:elasticloadbalancing:${local.aws_region}:${local.acctid}:listener/app/*",
+      "arn:aws:elasticloadbalancing:${local.aws_region}:${local.acctid}:listener-rule/app/*",
       "arn:aws:elasticloadbalancing:${local.aws_region}:${local.acctid}:loadbalancer/*",
       "arn:aws:elasticloadbalancing:${local.aws_region}:${local.acctid}:targetgroup/*"
     ]
@@ -119,7 +121,7 @@ data "aws_iam_policy_document" "execution_role" {
     ]
     effect = "Allow"
     resources = [
-      "arn:aws:redshift:${local.aws_region}:${local.acctid}:*/*"
+      "arn:aws:redshift:${local.aws_region}:${local.acctid}:cluster:*"
     ]
   }
   statement {
@@ -132,6 +134,18 @@ data "aws_iam_policy_document" "execution_role" {
     effect = "Allow"
     resources = [
       "arn:aws:dynamodb:${local.aws_region}:${local.acctid}:*/*"
+    ]
+  }
+  statement {
+    sid = "UpdateTagsLambda"
+    actions = [
+      "lambda:ListTags",
+      "lambda:TagResource",
+      "lambda:UntagResource",
+    ]
+    effect = "Allow"
+    resources = [
+      "arn:aws:lambda:${local.aws_region}:${local.acctid}:function:*"
     ]
   }
 }
