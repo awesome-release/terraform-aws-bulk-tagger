@@ -17,6 +17,7 @@ _TAGS_TO_FILTER = "TagKeyExclusion"
 _RESOURCE_TYPE_FILTERS = "ResourceTypeFilters"
 _RESOURCE_TAG_MAPPING_LIST = "ResourceTagMappingList"
 _FAILED_RESOURCES_MAP = "FailedResourcesMap"
+_STATUS_CODE = "StatusCode"
 
 def divide_chunks(l, n):
     for i in range(0, len(l), n):
@@ -99,8 +100,9 @@ def bulk_tagger(event, context):
             ResourceARNList=arns, Tags=event[_TAGS_TO_APPLY]
         )
 
-        if len(tagging_result[_FAILED_RESOURCES_MAP]) > 0:
-            FailedResourcesMap.append(tagging_result[_FAILED_RESOURCES_MAP])
+        for key, value in tagging_result[_FAILED_RESOURCES_MAP].items():
+            if value[_STATUS_CODE] > 400:
+                FailedResourcesMap.append(tagging_result[_FAILED_RESOURCES_MAP])
 
         time.sleep(5)
 
